@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-img = cv.imread(r'C:\Users\raul0\PycharmProjects\university-computervision-exercises\images\legos.jpg', 1)
+img = cv.imread('../images/legos.jpg', 1)
 
 hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
 (h, s, v) = cv.split(hsv)
