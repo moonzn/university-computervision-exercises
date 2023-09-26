@@ -1,6 +1,6 @@
 import cv2 as cv
 
-img = cv.imread(r'C:\Users\raul0\PycharmProjects\university-computervision-exercises\images\lenna.png', 1)
+img = cv.imread('../images/lenna.png', 1)
 
 for x in range(127, 383):
     for y in range(127, 383):
