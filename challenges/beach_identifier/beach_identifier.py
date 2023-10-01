@@ -2,7 +2,7 @@
 APVC - Challenge 1 (Beach classifier)
 
 Instructions:
-• To run this program you must place an "images" directory in the same location as this script.
+• To run this program you must place an "images" directory in the same directory as this script.
 • Place images of beaches in the "images" directory, the name of which should begin with "beach".
 • The rest of the images should start with "nonbeach".
 
@@ -47,7 +47,7 @@ def classifier(img):
     mask_yellow = cv.bitwise_and(mask_h_yellow, mask_s_yellow)
 
     # Function that evaluates the mask.
-    # Checks whether the mask contains a percentage of white pixels equal to or greater than the set limit.
+    # Checks whether the mask contains a percentage of white pixels equal to or greater than the set threshold.
     def evaluate_mask(mask):
         size = mask.size
         n = cv.countNonZero(mask)
@@ -130,7 +130,7 @@ def load_directory():
     return images, classes
 
 
-# This function creates and returns a grid with the images and their classification (right or wrong) written on them.
+# This function creates and returns a grid with the images and their classification in text (over the image)
 def create_image_grid(images):
     rows = math.floor(math.sqrt(len(images)))
     cols = math.ceil(len(images) / rows)
