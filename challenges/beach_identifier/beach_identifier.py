@@ -7,6 +7,8 @@ import os
 directory = "images"
 image_width = 200
 image_height = 200
+total = 0
+correct = 0
 
 
 def classifier(img):
@@ -14,12 +16,14 @@ def classifier(img):
 
     # mask yellows (sand) on bottom half of the img?
 
-    return "prediction in string"
+    return "beach"
 
 
 def color_code_prediction(img, clazz, prediction):
+    global correct
     if clazz == prediction:
         color = (0, 255, 0)
+        correct += 1
     else:
         color = (0, 0, 255)
 
@@ -31,11 +35,11 @@ def color_code_prediction(img, clazz, prediction):
 
     thickness = 2
 
-    cv.putText(img, 'prediction', org, font, font_scale, color, thickness, cv.LINE_AA)
+    cv.putText(img, f'{prediction}', org, font, font_scale, color, thickness, cv.LINE_AA)
 
 
 def metrics():
-    print("ratio (corrects/total)")
+    print(f"Accuracy: {correct/total*100}%")
 
 
 def load_directory():
@@ -75,6 +79,8 @@ def create_image_grid(images):
 
 def main():
     images, classes = load_directory()
+    global total
+    total = len(images)
 
     for idx, img in enumerate(images):
         prediction = classifier(img)
@@ -83,6 +89,7 @@ def main():
 
     tile = create_image_grid(images)
 
+    metrics()
     cv.imshow("Result", tile)
     cv.waitKey(0)
 
