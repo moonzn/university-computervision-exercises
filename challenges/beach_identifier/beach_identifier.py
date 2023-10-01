@@ -58,10 +58,6 @@ def create_image_grid(images):
     cols = math.ceil(len(images) / rows)
     padding = rows * cols - len(images)
 
-    print(f"rows: {rows}")
-    print(f"cols: {cols}")
-    print(f"padding: {padding}")
-
     def divide_chunks(ls, n):
 
         for i in range(0, len(ls), n):
