@@ -131,6 +131,7 @@ def load_directory():
 
 
 # This function creates and returns a grid with the images and their classification in text (over the image)
+# Images are resized AFTER being classified, just so they can fit nicely on the screen
 def create_image_grid(images):
     rows = math.floor(math.sqrt(len(images)))
     cols = math.ceil(len(images) / rows)
