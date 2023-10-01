@@ -1,6 +1,5 @@
 import numpy as np
 import cv2 as cv
-import random
 import math
 import os
 
@@ -10,32 +9,60 @@ image_width = 200
 image_height = 200
 total = 0
 correct = 0
+threshold = 0.45
 
 
 def classifier(img):
     # convert image to hsv
     # crop twice, horizontal and vertical
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+    (h, s, v) = cv.split(hsv)
+
+    mask_h_blue = cv.inRange(h, 100, 125)
+    mask_s_blue = cv.inRange(s, 5, 255)
+
+    mask_h_yellow = cv.inRange(h, 0, 30)
+    mask_s_yellow = cv.inRange(s, 5, 255)
+
+    mask_blue = cv.bitwise_and(mask_h_blue, mask_s_blue)
+    mask_yellow = cv.bitwise_and(mask_h_yellow, mask_s_yellow)
+
+    def evaluate_mask(mask):
+        size = mask.size
+        n = cv.countNonZero(mask)
+        return n / size >= threshold
+
+    (height, width, c) = hsv.shape
 
     # mask blues (water) on top half of the img?
+    mask_blue_top = mask_blue[0:height // 2]
     # mask yellows (sand) on bottom half of the img?
+    mask_yellow_bottom = mask_yellow[height // 2:height]
+
+    if evaluate_mask(mask_blue_top) and evaluate_mask(mask_yellow_bottom):
+        return "beach"
 
     # OR
 
     # mask blues (water) on left half of the img?
+    mask_blue_left = mask_blue[0:height, 0:width // 2]
     # mask yellows (sand) on right half of the img?
+    mask_yellow_right = mask_yellow[0:height, width // 2:width]
+
+    if evaluate_mask(mask_blue_left) and evaluate_mask(mask_yellow_right):
+        return "beach"
 
     # OR
 
     # mask blues (water) on right half of the img?
+    mask_blue_right = mask_blue[0:height, width // 2:width]
     # mask yellows (sand) on left half of the img?
+    mask_yellow_left = mask_yellow[0:height, 0:width // 2]
 
-    # if one of the above predicts beach then beach else nonbeach?
+    if evaluate_mask(mask_blue_right) and evaluate_mask(mask_yellow_left):
+        return "beach"
 
-    # placeholder
-
-    ops = ["beach", "nonbeach"]
-
-    return random.choice(ops)
+    return "nonbeach"
 
 
 def color_code_prediction(img, clazz, prediction):
