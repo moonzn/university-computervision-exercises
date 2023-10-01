@@ -13,6 +13,9 @@ correct = 0
 
 
 def classifier(img):
+    # convert image to hsv
+    # crop twice, horizontal and vertical
+
     # mask blues (water) on top half of the img?
     # mask yellows (sand) on bottom half of the img?
 
