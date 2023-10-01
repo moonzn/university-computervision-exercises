@@ -16,7 +16,7 @@ def classifier(img):
 
     # mask yellows (sand) on bottom half of the img?
 
-    return "beach"
+    return "nonbeach"
 
 
 def color_code_prediction(img, clazz, prediction):
@@ -31,11 +31,8 @@ def color_code_prediction(img, clazz, prediction):
 
     org = (10, 185)
 
-    font_scale = 0.8
-
-    thickness = 2
-
-    cv.putText(img, f'{prediction}', org, font, font_scale, color, thickness, cv.LINE_AA)
+    cv.putText(img, f'{prediction}', org, font, 0.8, (0, 0, 0), 8, cv.LINE_AA)
+    cv.putText(img, f'{prediction}', org, font, 0.8, color, 2, cv.LINE_AA)
 
 
 def metrics():
