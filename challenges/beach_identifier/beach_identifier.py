@@ -4,7 +4,9 @@ import math
 import os
 
 # Beach classifier
-directory = "images/"
+directory = "images"
+image_width = 200
+image_height = 200
 
 
 def classifier(img):
@@ -23,14 +25,13 @@ def color_code_prediction(img, clazz, prediction):
 
     font = cv.FONT_HERSHEY_SIMPLEX
 
-    org = (50, 50)
+    org = (40, 175)
 
-    font_scale = 1
+    font_scale = 0.8
 
     thickness = 2
 
-    cv.putText(img, 'prediction', org, font,
-               font_scale, color, thickness, cv.LINE_AA)
+    cv.putText(img, 'prediction', org, font, font_scale, color, thickness, cv.LINE_AA)
 
 
 def metrics():
@@ -52,19 +53,28 @@ def load_directory():
 
 
 def create_image_grid(images):
-    width = 200
-    height = 200
 
-    for idx, img in enumerate(images):
-        images[idx] = cv.resize(img, (width, height))
-
-    cols = math.floor(math.sqrt(len(images)))
-    rows = math.ceil(len(images) / cols)
+    rows = math.floor(math.sqrt(len(images)))
+    cols = math.ceil(len(images) / rows)
     padding = rows * cols - len(images)
 
-    print(rows)
-    print(cols)
-    print(padding)
+    print(f"rows: {rows}")
+    print(f"cols: {cols}")
+    print(f"padding: {padding}")
+
+    def divide_chunks(ls, n):
+
+        for i in range(0, len(ls), n):
+            yield ls[i:i + n]
+
+    rows_list = list(divide_chunks(images, cols))
+
+    for p in range(padding):
+        rows_list[len(rows_list) - 1].append(np.ones([image_width, image_height, 3], dtype=np.uint8) * 255)
+
+    tile = cv.vconcat([cv.hconcat(list_h) for list_h in rows_list])
+
+    return tile
 
 
 def main():
@@ -72,9 +82,13 @@ def main():
 
     for idx, img in enumerate(images):
         prediction = classifier(img)
-        color_code_prediction(img, classes[idx], prediction)
+        images[idx] = cv.resize(img, (image_width, image_height))
+        color_code_prediction(images[idx], classes[idx], prediction)
 
-    create_image_grid(images)
+    tile = create_image_grid(images)
+
+    cv.imshow("Result", tile)
+    cv.waitKey(0)
 
 
 if __name__ == "__main__":
