@@ -29,7 +29,7 @@ def color_code_prediction(img, clazz, prediction):
 
     font = cv.FONT_HERSHEY_SIMPLEX
 
-    org = (40, 175)
+    org = (10, 185)
 
     font_scale = 0.8
 
