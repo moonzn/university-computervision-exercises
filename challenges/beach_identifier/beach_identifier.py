@@ -1,5 +1,6 @@
 import numpy as np
 import cv2 as cv
+import random
 import math
 import os
 
@@ -13,10 +14,25 @@ correct = 0
 
 def classifier(img):
     # mask blues (water) on top half of the img?
-
     # mask yellows (sand) on bottom half of the img?
 
-    return "nonbeach"
+    # OR
+
+    # mask blues (water) on left half of the img?
+    # mask yellows (sand) on right half of the img?
+
+    # OR
+
+    # mask blues (water) on right half of the img?
+    # mask yellows (sand) on left half of the img?
+
+    # if one of the above predicts beach then beach else nonbeach?
+
+    # placeholder
+
+    ops = ["beach", "nonbeach"]
+
+    return random.choice(ops)
 
 
 def color_code_prediction(img, clazz, prediction):
@@ -36,7 +52,7 @@ def color_code_prediction(img, clazz, prediction):
 
 
 def metrics():
-    print(f"Accuracy: {correct/total*100}%")
+    print(f"Accuracy: {math.ceil(correct / total * 100)}%")
 
 
 def load_directory():
@@ -54,7 +70,6 @@ def load_directory():
 
 
 def create_image_grid(images):
-
     rows = math.floor(math.sqrt(len(images)))
     cols = math.ceil(len(images) / rows)
     padding = rows * cols - len(images)
