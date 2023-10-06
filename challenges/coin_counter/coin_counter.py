@@ -9,19 +9,20 @@ image_height = 200
 
 
 def coin_counter(img):
-    return 25
+    return "30"
 
 
 def put_coin_count(img, count, prediction):
     if count == prediction:
+        print("true")
         color = (0, 255, 0)
     else:
         color = (0, 0, 255)
 
     font = cv.FONT_HERSHEY_SIMPLEX
     org = (10, 185)
-    cv.putText(img, f'{prediction}', org, font, 0.8, (0, 0, 0), 8, cv.LINE_AA)
-    cv.putText(img, f'{prediction}', org, font, 0.8, color, 2, cv.LINE_AA)
+    cv.putText(img, f'{prediction}/{count}', org, font, 0.8, (0, 0, 0), 8, cv.LINE_AA)
+    cv.putText(img, f'{prediction}/{count}', org, font, 0.8, color, 2, cv.LINE_AA)
 
 
 def load_directory():
