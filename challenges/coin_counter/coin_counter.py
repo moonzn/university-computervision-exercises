@@ -15,36 +15,20 @@ def coin_counter(img):
     (t, img_bin) = cv.threshold(gray_img, 0, 255, cv.THRESH_OTSU)
     img_bin = cv.bitwise_not(img_bin)
 
-    # Option 1
-    # strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (2, 2))
-    # dilated_img = cv.dilate(img_bin, strel)
-    # strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (12, 12))
-    # eroded_img = cv.erode(dilated_img, strel)
-
-    # Option 2
-    # strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (2, 2))
-    # eroded_img = cv.erode(img_bin, strel)
-    # strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (3, 3))
-    # dilated_img = cv.dilate(eroded_img, strel)
-
-    canny_img = cv.Canny(img_bin, 0, 200, apertureSize=7, L2gradient=True)
+    # Application of morphological operations
+    strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (6, 6))
+    dilated_img = cv.dilate(img_bin, strel)
+    strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (42, 42))
+    eroded_img = cv.erode(dilated_img, strel)
 
     # Counting coins
-    (numLabels, labels, boxes, centroids) = cv.connectedComponentsWithStats(canny_img)
-
-    cv.imshow("Picture", img_bin)
-    # cv.imshow("Opened Picture", img_opened)
-    # cv.imshow("Eroded Picture", eroded_img)
-    cv.imshow("Dilated Picture", canny_img)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    (numLabels, labels, boxes, centroids) = cv.connectedComponentsWithStats(eroded_img)
 
     return str(numLabels)
 
 
 def put_coin_count(img, count, prediction):
     if count == prediction:
-        print("true")
         color = (0, 255, 0)
     else:
         color = (0, 0, 255)
