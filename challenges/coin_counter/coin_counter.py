@@ -16,13 +16,17 @@ def coin_counter(img):
     img_bin = cv.bitwise_not(img_bin)
 
     # Application of morphological operations
-    strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (6, 6))
+    strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (8, 8))
     dilated_img = cv.dilate(img_bin, strel)
-    strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (42, 42))
+    strel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (44, 44))
     eroded_img = cv.erode(dilated_img, strel)
 
     # Counting coins
     (numLabels, labels, boxes, centroids) = cv.connectedComponentsWithStats(eroded_img)
+
+    cv.imshow("img", img_bin)
+    cv.imshow("coins", eroded_img)
+    cv.waitKey(0)
 
     return str(numLabels)
 
