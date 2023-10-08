@@ -1,3 +1,19 @@
+"""
+APVC - Challenge 2 (Coin counter)
+
+Instructions:
+• To run this program you must place an "images" directory in the same directory as this script.
+• Place images of coins in the "images" directory.
+
+The images given with 6 and 10 coins are being classified with 7 and 11 respectively.
+We weren't able to understand why.
+
+Authors:
+• Bernardo Grilo, n.º 93251
+• Gonçalo Carrasco, n.º 109379
+• Raúl Nascimento, n.º 87405
+"""
+
 import numpy as np
 import cv2 as cv
 import math
@@ -8,7 +24,10 @@ image_width = 200
 image_height = 200
 
 
+# Function corresponding to the counter.
+# This function receives the image and returns the number of coins counted.
 def coin_counter(img):
+    # Convert to grayscale
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     # Image binarization
@@ -24,13 +43,12 @@ def coin_counter(img):
     # Counting coins
     (numLabels, labels, boxes, centroids) = cv.connectedComponentsWithStats(eroded_img)
 
-    cv.imshow("img", img_bin)
-    cv.imshow("coins", eroded_img)
-    cv.waitKey(0)
-
     return str(numLabels)
 
 
+# Method that counts the number of correct predictions made by the classifier.
+# It also writes the prediction on the image and colors the text green or red.
+# This colorization depends on whether the prediction is correct.
 def put_coin_count(img, count, prediction):
     if count == prediction:
         color = (0, 255, 0)
@@ -43,6 +61,8 @@ def put_coin_count(img, count, prediction):
     cv.putText(img, f'{prediction}/{count}', org, font, 0.8, color, 2, cv.LINE_AA)
 
 
+# Reading the folder containing the images.
+# The images and their corresponding coin count are read out.
 def load_directory():
     images = []
     counts = []
@@ -54,6 +74,8 @@ def load_directory():
     return images, counts
 
 
+# This function creates and returns a grid with the images and coin count in text (over the image)
+# Images are resized AFTER being classified, just so they can fit nicely on the screen
 def create_image_grid(images):
     rows = math.floor(math.sqrt(len(images)))
     cols = math.ceil(len(images) / rows)
@@ -76,6 +98,8 @@ def create_image_grid(images):
 def main():
     images, counts = load_directory()
 
+    # Counting the coins for each image and structuring it for subsequent display of the image
+    # and its coin count on a grid
     for idx, img in enumerate(images):
         count = coin_counter(img)
         images[idx] = cv.resize(img, (image_width, image_height))
