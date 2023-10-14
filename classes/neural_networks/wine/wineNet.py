@@ -1,17 +1,10 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from keras import layers
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
-
-import tensorflow as tf
-# from tensorflow.keras import layers
-
-# workaround para o caso do "from" da linha anterior dar erro
-import keras.api._v2.keras as keras
-from keras import layers
-
 
 # Ler um ficheiro com o dataset wineData - este data set contém 13 atributos
 # (features) referentes a vinhos italinanos de tres produtores diferentes.
@@ -59,6 +52,8 @@ x_train = samples[:split, :]
 y_train = labels[:split, :]
 x_val = samples[split + 1:, :]
 y_val = labels[split + 1:, :]
+
+print(x_train.shape)
 
 ##################################################################
 # Definicao, compilacao e treino do modelo
