@@ -1,3 +1,18 @@
+"""
+APVC - Challenge 3 (Handwritten digit recognition)
+
+Instructions:
+• All you need is an Internet connection.
+
+There's a lot of prints at the end showing metrics such as overall accuracy, per class
+metrics and the most common misclassifications.
+
+Authors:
+• Bernardo Grilo, n.º 93251
+• Gonçalo Carrasco, n.º 109379
+• Raúl Nascimento, n.º 87405
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -95,12 +110,20 @@ fnr = fn / (tp + fn)
 acc = (tp + tn) / (tp + fp + fn + tn)
 
 # Print metrics
-print(f"True Positive Rate: {tpr}\n")
-print(f"False Positive Rate: {fpr}\n")
-print(f"True Negative Rate: {tnr}\n")
-print(f"False Negative Rate: {fnr}\n")
+print(f"Per class True Positive Rate: {tpr}\n")
+print(f"Per class False Positive Rate: {fpr}\n")
+print(f"Per class True Negative Rate: {tnr}\n")
+print(f"Per class False Negative Rate: {fnr}\n")
 print(f"Per class accuracy: {acc}\n")
-print(f"Overall accuracy: {cm_accuracy}")
+print(f"\033[1mOverall accuracy\033[0m: {cm_accuracy}")
+
+cm_copy = cm.copy()
+np.fill_diagonal(cm_copy, 0)
+max_indexes = np.argpartition(-cm_copy, 5, axis=None)[:5]
+print("\nThe 5 most misclassified digits are:")
+for s in max_indexes:
+    digit = str(s)
+    print(f"{digit[0]} misclassified as {digit[1]}")
 
 # Show figures - accuracy, loss and confusion matrix
 plt.figure(num=1)
