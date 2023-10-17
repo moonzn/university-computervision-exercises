@@ -47,22 +47,22 @@ print("Test labels shape:             ", y_test.shape)
 # Define, compile and train model
 
 # Define neural network arquitecture
-digitModel = tf.keras.Sequential([
+fashion_model = tf.keras.Sequential([
     layers.Flatten(input_shape=(28, 28)),
     layers.Dense(128, activation='tanh', input_shape=(None, 1, 784)),
     layers.Dense(10, activation='softmax')
 ])
 
 # Neural network summary
-digitModel.summary()
+fashion_model.summary()
 
 # Compile model with loss function and optimization algorithm
-digitModel.compile(loss=tf.losses.CategoricalCrossentropy(),
-                   optimizer=tf.optimizers.Adam(learning_rate=0.001),
-                   metrics=['accuracy'])
+fashion_model.compile(loss=tf.losses.CategoricalCrossentropy(),
+                      optimizer=tf.optimizers.Adam(learning_rate=0.001),
+                      metrics=['accuracy'])
 
 # Train model and store training data
-history = digitModel.fit(x_train, y_train, batch_size=1000, epochs=100, validation_data=(x_val, y_val))
+history = fashion_model.fit(x_train, y_train, batch_size=1000, epochs=100, validation_data=(x_val, y_val))
 
 # -----------------------------------------------------------------------------------------------------
 # Make predictions and show results
@@ -71,7 +71,7 @@ history = digitModel.fit(x_train, y_train, batch_size=1000, epochs=100, validati
 y_true = np.argmax(y_test, axis=1)
 
 # Make predictions
-output_pred = digitModel(x_test)
+output_pred = fashion_model(x_test)
 y_pred = np.argmax(output_pred, axis=1)
 
 # Confusion matrix and metrics
