@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 # Neste exemplo o dataset e' carregado a partir do sistema de ficheiros
 # e apenas e' dividido em treino e validacao
 
-BATCH_SIZE = 32
+BATCH_SIZE = 100
 IMG_HEIGHT = 160
 IMG_WIDTH = 160
 TRAIN_DATASET_PATH = "cats_and_dogs_dataset/train"  # ajustar consoante a localizacao
@@ -71,15 +71,12 @@ test_ds = test_ds.cache()
 model = tf.keras.models.Sequential([
     layers.Rescaling(1. / 255, input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
     layers.RandomFlip("horizontal"),
-    layers.RandomRotation(0.1),
+    layers.RandomRotation(0.25),
     layers.Conv2D(8, 5, padding='same', activation='relu'),
-    layers.Dropout(0.2),
     layers.MaxPooling2D(),
     layers.Conv2D(16, 3, padding='same', activation='relu'),
-    layers.Dropout(0.2),
     layers.MaxPooling2D(),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
-    layers.Dropout(0.2),
     layers.MaxPooling2D(),
     layers.Flatten(),
     layers.Dense(128, activation='relu'),
@@ -90,7 +87,7 @@ model.summary()
 
 model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy'])
 
-EPOCHS = 100
+EPOCHS = 50
 history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
 
 # -----------------------------------------------------------------------------------------------------
