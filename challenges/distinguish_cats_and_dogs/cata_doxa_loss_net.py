@@ -1,5 +1,5 @@
 """
-APVC - Challenge 3 (Cat/Dog Classifier)
+APVC - Challenge 4 (Cat/Dog Classifier)
 
 Instructions:
 • To run this program you must place a "cats_and_dogs_dataset" directory in the same directory as this script.
@@ -18,7 +18,12 @@ Instructions:
             -dogs
                 (...)
 
-This version of the neural network has a better loss function but slightly less overall accuracy.
+The "cata_doxa_acc_net" has a higher peak of overall accuracy (79.2%), but its loss function stagnates sooner.
+The "cat_doxa_loss_net" overall accuracy doesn't peak as high (78.8%), but has a better loss function. However,
+it takes considerably longer to train.
+
+Furthermore, the random initialization of the weights introduces alot of variability to the loss function
+and the overall accuracy.
 
 Authors:
 • Bernardo Grilo, n.º 93251
@@ -67,6 +72,9 @@ val_ds, test_ds = tf.keras.utils.image_dataset_from_directory(
     seed=SEED,
     image_size=(IMG_HEIGHT, IMG_WIDTH),
     batch_size=BATCH_SIZE)
+
+# Get labels
+labels = train_ds.class_names
 
 # Cache images in memory
 train_ds = train_ds.cache()

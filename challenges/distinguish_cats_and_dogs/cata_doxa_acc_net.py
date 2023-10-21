@@ -1,31 +1,55 @@
+"""
+APVC - Challenge 4 (Cat/Dog Classifier)
+
+Instructions:
+• To run this program you must place a "cats_and_dogs_dataset" directory in the same directory as this script.
+• The directory should be organized like this:
+    - cats_and_dogs_dataset
+        -train
+            -cats
+                -cat.0.jpg
+                -cat.1.jpg
+                (...)
+            -dogs
+                (...)
+        -validation
+            -cats
+                (...)
+            -dogs
+                (...)
+
+The "cata_doxa_acc_net" has a higher peak of overall accuracy (79.2%), but its loss function stagnates sooner.
+The "cat_doxa_loss_net" overall accuracy doesn't peak as high (by 0.4%), but has a better loss function. However,
+it takes considerably longer to train.
+
+Authors:
+• Bernardo Grilo, n.º 93251
+• Gonçalo Carrasco, n.º 109379
+• Raúl Nascimento, n.º 87405
+"""
+
 import logging
 import os
 import numpy as np
+import tensorflow as tf
+from keras import layers
+import matplotlib.pyplot as plt
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix
 
 logging.disable(logging.WARNING)
 logging.disable(logging.INFO)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-import tensorflow as tf
-from keras import layers
-
-from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score
-from sklearn.metrics import confusion_matrix
-
-import matplotlib.pyplot as plt
-
-###################################################################
-#
-# Neste exemplo o dataset e' carregado a partir do sistema de ficheiros
-# e apenas e' dividido em treino e validacao
+# -----------------------------------------------------------------------------------------------------
+# Read and prepare dataset
 
 BATCH_SIZE = 100
 IMG_HEIGHT = 160
 IMG_WIDTH = 160
-TRAIN_DATASET_PATH = "cats_and_dogs_dataset/train"  # ajustar consoante a localizacao
-VAL_DATASET_PATH = "cats_and_dogs_dataset/validation"  # ajustar consoante a localizacao
-SEED = 1245  # semente do gerador de numeros aleotorios que faz o split treino/validacao
-VAL_TEST_SPLIT = 0.5  # fracao de imagens para o conjunto de validacao
+TRAIN_DATASET_PATH = "cats_and_dogs_dataset/train"
+VAL_DATASET_PATH = "cats_and_dogs_dataset/validation"
+SEED = 1245  # Seed for split
+VAL_TEST_SPLIT = 0.5  # Fraction of images for validation
 NUM_CLASSES = 2
 
 train_ds = tf.keras.utils.image_dataset_from_directory(
@@ -46,28 +70,17 @@ val_ds, test_ds = tf.keras.utils.image_dataset_from_directory(
     image_size=(IMG_HEIGHT, IMG_WIDTH),
     batch_size=BATCH_SIZE)
 
-# labels inferidas a partir dos nomes dos diretorios
+# Get labels
 labels = train_ds.class_names
-print(train_ds.class_names)
-print(val_ds.class_names)
-print(test_ds.class_names)
 
-plt.figure(1, figsize=(10, 10))
-for x_batch, y_batch in train_ds.take(1):
-    for i in range(9):
-        ax = plt.subplot(3, 3, i + 1)
-        plt.imshow(x_batch[i].numpy().astype("uint8"))
-        plt.title(labels[np.argmax(y_batch[i, :])])
-        plt.axis("off")
-plt.show()
-
-# optimazacoes para manter a imagens em memoria
+# Cache images in memory
 train_ds = train_ds.cache()
 val_ds = val_ds.cache()
 test_ds = test_ds.cache()
 
-# nota - os layers de data augmentation originam warnings (em versoes do tensorflow superiores a 2.8.3)
-# esses warnings sao para ignorar
+# -----------------------------------------------------------------------------------------------------
+# Define, compile and train model
+
 model = tf.keras.models.Sequential([
     layers.Rescaling(1. / 255, input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
     layers.RandomFlip("horizontal"),
@@ -90,11 +103,12 @@ model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), 
 EPOCHS = 50
 history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
 
+model.save_weights("weights/acc_model/checkpoint")
+
 # -----------------------------------------------------------------------------------------------------
 # Make predictions and show results
 
-# opter as predicoes e ground thruth num formato mais facil de tratar para mostrar os resultados
-# (um vetor de ids das classes)
+# Make predictions
 y_pred = model.predict(test_ds)
 y_pred = tf.argmax(y_pred, axis=1)
 
