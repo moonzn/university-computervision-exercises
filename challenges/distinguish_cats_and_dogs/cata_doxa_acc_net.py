@@ -103,8 +103,6 @@ model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), 
 EPOCHS = 50
 history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
 
-model.save_weights("weights/acc_model/checkpoint")
-
 # -----------------------------------------------------------------------------------------------------
 # Make predictions and show results
 
