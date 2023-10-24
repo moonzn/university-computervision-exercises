@@ -1,39 +1,9 @@
-"""
-APVC - Challenge 4 (Cat/Dog Classifier)
-
-Instructions:
-• To run this program you must place a "cats_and_dogs_dataset" directory in the same directory as this script.
-• The directory should be organized like this:
-    - cats_and_dogs_dataset
-        -train
-            -cats
-                -cat.0.jpg
-                -cat.1.jpg
-                (...)
-            -dogs
-                (...)
-        -validation
-            -cats
-                (...)
-            -dogs
-                (...)
-
-The "cata_doxa_acc_net" has a higher peak of overall accuracy (79.2%), but its loss function stagnates sooner.
-The "cat_doxa_loss_net" overall accuracy doesn't peak as high (by 0.4%), but has a better loss function. However,
-it takes considerably longer to train.
-
-Authors:
-• Bernardo Grilo, n.º 93251
-• Gonçalo Carrasco, n.º 109379
-• Raúl Nascimento, n.º 87405
-"""
-
 import logging
 import os
 import numpy as np
 import tensorflow as tf
 from keras import layers
-from keras.applications.vgg19 import VGG19, preprocess_input
+from keras.applications.resnet_v2 import ResNet152V2
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score, confusion_matrix
 
@@ -82,24 +52,20 @@ test_ds = test_ds.cache()
 # -----------------------------------------------------------------------------------------------------
 # Define, compile and train model
 
-vggModel = VGG19(include_top=False)
-preprocess_input(train_ds)
-preprocess_input(val_ds)
-preprocess_input(test_ds)
-vggModel.trainable = False
-
-vggModel.summary()
+resnetModel = ResNet152V2(weights="imagenet", include_top=False)
+resnetModel.trainable = False
 
 model = tf.keras.models.Sequential([
-    vggModel,
+    layers.Rescaling(1./255, offset=-1, input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
+    resnetModel,
     layers.Flatten(),
-    layers.Dense(128, activation='relu'),
+    layers.Dense(256, activation='relu'),
     layers.Dense(NUM_CLASSES, activation="softmax")
 ])
 
 model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy'])
 
-EPOCHS = 50
+EPOCHS = 10
 history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
 
 # -----------------------------------------------------------------------------------------------------

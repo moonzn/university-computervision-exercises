@@ -65,7 +65,7 @@ model = tf.keras.models.Sequential([
 
 model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy'])
 
-EPOCHS = 50
+EPOCHS = 10
 history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
 
 # -----------------------------------------------------------------------------------------------------
