@@ -56,7 +56,7 @@ resnetModel = ResNet152V2(weights="imagenet", include_top=False)
 resnetModel.trainable = False
 
 model = tf.keras.models.Sequential([
-    layers.Rescaling(1./255, offset=-1, input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
+    layers.Rescaling(2./255, offset=-1, input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
     resnetModel,
     layers.Flatten(),
     layers.Dense(256, activation='relu'),
