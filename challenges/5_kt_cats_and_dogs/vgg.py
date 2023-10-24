@@ -51,9 +51,11 @@ test_ds = test_ds.cache()
 
 # -----------------------------------------------------------------------------------------------------
 # Define, compile and train model
-
+"""
 vggModel = VGG19(weights="imagenet", include_top=False)
 vggModel.trainable = False
+
+callback = tf.keras.callbacks.EarlyStopping(monitor="val_loss", mode="min", patience=2)
 
 model = tf.keras.models.Sequential([
     layers.Rescaling(2./255, offset=-1, input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)),
@@ -66,7 +68,11 @@ model = tf.keras.models.Sequential([
 model.compile(optimizer='adam', loss=tf.keras.losses.CategoricalCrossentropy(), metrics=['accuracy'])
 
 EPOCHS = 10
-history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds)
+history = model.fit(train_ds, epochs=EPOCHS, validation_data=val_ds, callbacks=[callback])
+
+model.save("models/vgg/vgg.keras")
+"""
+model = tf.keras.models.load_model("models/vgg/vgg.keras")
 
 # -----------------------------------------------------------------------------------------------------
 # Make predictions and show results
@@ -107,6 +113,7 @@ print(f"Per class False Negative Rate: {fnr}\n")
 print(f"Per class accuracy: {acc}\n")
 print(f"\033[1mOverall accuracy\033[0m: {cm_accuracy}")
 
+"""
 # Show figures - accuracy, loss and confusion matrix
 plt.figure(num=1)
 plt.plot(history.history['accuracy'])
@@ -116,6 +123,7 @@ plt.ylabel('accuracy')
 plt.xlabel('epoch')
 plt.legend(['train', 'val'], loc="upper left")
 plt.grid(True, ls='--')
+plt.savefig("models/vgg/accuracy.png")
 
 plt.figure(num=2)
 plt.plot(history.history['loss'])
@@ -125,8 +133,25 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'val'], loc="upper right")
 plt.grid(True, ls='--')
+plt.savefig("models/vgg/loss.png")
 
 disp = ConfusionMatrixDisplay(confusion_matrix=cm,
                               display_labels=labels)
 disp.plot(cmap=plt.cm.Blues)
+disp.figure_.savefig("models/vgg/cm.png")
+plt.show()
+"""
+
+plt.figure(num=1)
+img_acc = plt.imread("models/vgg/accuracy.png")
+plt.axis("off")
+plt.imshow(img_acc)
+plt.figure(num=2)
+img_loss = plt.imread("models/vgg/loss.png")
+plt.axis("off")
+plt.imshow(img_loss)
+plt.figure(num=3)
+img_cm = plt.imread("models/vgg/cm.png")
+plt.axis("off")
+plt.imshow(img_cm)
 plt.show()
