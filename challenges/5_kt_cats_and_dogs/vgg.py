@@ -1,3 +1,43 @@
+"""
+APVC - Challenge 5 (Cat/Dog classifier with knowledge transfer)
+
+This file implements a dog and cat classifier, using the pre-trained network of the VGG family.
+
+Instructions:
+• To run this program you must place a "cats_and_dogs_dataset" directory in the same directory as this script.
+• The directory should be organized like this:
+    - cats_and_dogs_dataset
+        -train
+            -cats
+                -cat.0.jpg
+                -cat.1.jpg
+                (...)
+            -dogs
+                (...)
+        -validation
+            -cats
+                (...)
+            -dogs
+                (...)
+
+• To make the program run faster, the trained model was saved in a file.
+• This model is loaded and used to classify the images.
+• The area of code used to define, train and compile the model is commented out.
+• You should also place the "models" directory in the same directory as this script.
+• The directory should be organized like this:
+    - models
+        -resnet
+            -resnet.keras
+        -vgg
+            -vgg.keras
+
+
+Authors:
+• Bernardo Grilo, n.º 93251
+• Gonçalo Carrasco, n.º 109379
+• Raúl Nascimento, n.º 87405
+"""
+
 import logging
 import os
 import numpy as np
@@ -17,8 +57,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 BATCH_SIZE = 100
 IMG_HEIGHT = 224
 IMG_WIDTH = 224
-TRAIN_DATASET_PATH = "../4_distinguish_cats_and_dogs/cats_and_dogs_dataset/train"
-VAL_DATASET_PATH = "../4_distinguish_cats_and_dogs/cats_and_dogs_dataset/validation"
+TRAIN_DATASET_PATH = "cats_and_dogs_dataset/train"
+VAL_DATASET_PATH = "cats_and_dogs_dataset/validation"
 SEED = 1245  # Seed for split
 VAL_TEST_SPLIT = 0.5  # Fraction of images for validation
 NUM_CLASSES = 2
@@ -140,7 +180,7 @@ disp = ConfusionMatrixDisplay(confusion_matrix=cm,
 disp.plot(cmap=plt.cm.Blues)
 disp.figure_.savefig("models/vgg/cm.png")
 plt.show()
-"""
+
 
 plt.figure(num=1)
 img_acc = plt.imread("models/vgg/accuracy.png")
@@ -155,3 +195,4 @@ img_cm = plt.imread("models/vgg/cm.png")
 plt.axis("off")
 plt.imshow(img_cm)
 plt.show()
+"""
