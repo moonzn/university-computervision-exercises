@@ -28,7 +28,7 @@ y_val = y_train[:val_split, :]
 y_train = y_train[val_split:, :]
 
 # Labels IDs and image dimensions
-labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+labels = ["0", "1", "2", "3", "4", "5", "6_object_detector", "7", "8", "9"]
 img_height = 28
 img_width = 28
 
@@ -133,6 +133,6 @@ plt.xlabel('epoch')
 plt.legend(['train', 'val'], loc="upper right")
 plt.grid(True, ls='--')
 
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["0", "1", "2", "3", "4", "5", "6_object_detector", "7", "8", "9"])
 disp.plot(cmap=plt.cm.Blues)
 plt.show()

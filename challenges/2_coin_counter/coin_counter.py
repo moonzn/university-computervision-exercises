@@ -5,7 +5,7 @@ Instructions:
 • To run this program you must place an "images" directory in the same directory as this script.
 • Place images of coins in the "images" directory.
 
-The images given with 6 and 10 coins are being classified with 7 and 11 respectively.
+The images given with 6_object_detector and 10 coins are being classified with 7 and 11 respectively.
 We weren't able to understand why.
 
 Authors:

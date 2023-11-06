@@ -16,7 +16,7 @@ from sklearn.metrics import confusion_matrix
 # 3) Ash
 # 4) Alcalinity of ash
 # 5) Magnesium
-# 6) Total phenols
+# 6_object_detector) Total phenols
 # 7) Flavanoids
 # 8) Nonflavanoid phenols
 # 9) Proanthocyanins
