@@ -2,14 +2,14 @@ import os
 import cv2 as cv
 import xml.etree.ElementTree as ET
 
-imgs_path = "dataset/images"
-labels_path = "dataset/labels"
+IMAGES_PATH = "dataset/images"
+LABELS_PATH = "dataset/labels"
 
 
 def load_images():
     images = []
-    for filename in os.listdir(imgs_path):
-        img = cv.imread(os.path.join(imgs_path, filename))
+    for filename in os.listdir(IMAGES_PATH):
+        img = cv.imread(os.path.join(IMAGES_PATH, filename))
         if img is not None:
             images.append(img)
     return images
@@ -17,8 +17,8 @@ def load_images():
 
 def load_bounding_boxes():
     boxes = []
-    for filename in os.listdir(labels_path):
-        path = os.path.join(labels_path, filename)
+    for filename in os.listdir(LABELS_PATH):
+        path = os.path.join(LABELS_PATH, filename)
         box = parse_xml(path)
         boxes.append(box)
     return boxes
@@ -31,7 +31,7 @@ def parse_xml(xml):
     # get root element
     root = tree.getroot()
 
-    # stores all boxes in an img
+    # stores all boxes of an img
     boxes_in_img = []
 
     for box in root.findall("./object/bndbox"):
