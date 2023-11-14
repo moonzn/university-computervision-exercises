@@ -1,15 +1,18 @@
 import cv2
 import numpy as np
-from draw_bounding_boxes import load_images
+from draw_bounding_boxes import load_images, load_bounding_boxes
 
 MODEL_FILE = "config/yolov5s.onnx"
 CLASS_FILE = "config/object_detection_classes_coco.txt"
 
-# caminho para o video a analisar
-DATASET_PATH = "dataset/images"
+DATASET_PATH = "dataset/images" # Caminho para as imagens a analisar
+LABELS_PATH = "dataset/labels" # Caminho para as anotações das imagens
 
-CONFIDENCE_THRESHOLD = 0.3  # Threshold para a confianca nas bounding boxes
+CONFIDENCE_THRESHOLD = 0.33  # Threshold para a confianca nas bounding boxes
 NMS_THRESHOLD = 0.4  # Threshold para o algoritmo non maximum supression
+
+WIDTH = 640  # largura da imagem no YOLOV5
+HEIGHT = 640 # altura da imagem no YOLOV5
 
 # ler os nomes das classes
 with open(CLASS_FILE, 'r') as f:
@@ -23,12 +26,19 @@ YoloModel = cv2.dnn.readNet(MODEL_FILE)
 YoloModel.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 # YoloModel.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
-# inicializar um stream de video - neste caso e um ficheiro
 images = load_images()
+boxes = load_bounding_boxes()
 
-for img in images:
+for idx in range(len(images)):
+    img = images[idx]
+    img_boxes = boxes[idx]
     img_height, img_width, channels = img.shape
-    blob = cv2.dnn.blobFromImage(image=img, scalefactor=1 / 255.0, size=(640, 640), swapRB=True)
+
+    # Fator de conversão (dimensões reais da imagem para dimensões lidas pelo Yolo)
+    x_conversion_factor = img_width / WIDTH
+    y_conversion_factor = img_height / HEIGHT
+
+    blob = cv2.dnn.blobFromImage(image=img, scalefactor=1 / 255.0, size=(WIDTH, HEIGHT), swapRB=True) # , size=(640, 640)
     YoloModel.setInput(blob)
     predictions = YoloModel.forward()
     outputs = predictions[0]
@@ -66,7 +76,7 @@ for img in images:
             confidences.append(float(confidence))
             classIDs.append(classID)
 
-    # Remover bounding boxes adicionais usando  non maximum suppression
+    # Remover bounding boxes adicionais usando non maximum suppression
     idxs = cv2.dnn.NMSBoxes(bboxes, confidences, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
 
     if len(idxs) > 0:
@@ -75,12 +85,23 @@ for img in images:
             (bbox_x, bbox_y) = (bboxes[i][0], bboxes[i][1])
             (bbox_w, bbox_h) = (bboxes[i][2], bboxes[i][3])
 
+            # Aplicação do fator de conversão para desenho das bounding boxes no local correto
+            bbox_x = int(bbox_x * x_conversion_factor)
+            bbox_y = int(bbox_y * y_conversion_factor)
+
             # colocar retangulos e texto a marcar os objetos identificados
             class_name = class_names[classIDs[i]]
             color = COLORS[classIDs[i]]
             cv2.rectangle(img, (bbox_x, bbox_y), (bbox_x + bbox_w, bbox_y + bbox_h), color, 2)
             text = "{}: {:.4f}".format(class_name, confidences[i])
-            cv2.putText(img, text, (bbox_x, bbox_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
+            cv2.putText(img, text, (bbox_x, bbox_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
+
+            # Cálculo das métricas
+            # TODO
+            #box = img_boxes[i]
+            #start_point = (int(box[0]), int(box[1]))
+            #end_point = (int(box[2]), int(box[3]))
+
 
     cv2.imshow('image', img)
     cv2.waitKey(0)
