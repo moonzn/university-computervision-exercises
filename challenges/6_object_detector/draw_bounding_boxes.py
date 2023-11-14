@@ -61,6 +61,37 @@ def draw_bounding_boxes(img, boxes):
     return img
 
 
+def cast_list_to_int(lst):
+    return list(map(int, lst))
+
+
+def calculate_iou(box1, box2):
+    x_inter1 = max(box1[0], box2[0])
+    y_inter1 = max(box1[1], box2[1])
+    x_inter2 = min(box1[2], box2[2])
+    y_inter2 = min(box1[3], box2[3])
+
+    if x_inter2 < x_inter1 or y_inter2 < y_inter1:
+        return 0
+
+    # Área da interseção
+    width_inter = abs(x_inter2 - x_inter1)
+    height_inter = abs(y_inter2 - y_inter1)
+    area_inter = width_inter * height_inter
+
+    # Área da união
+    width_ground_truth = abs(box1[2] - box1[0])
+    height_ground_truth = abs(box1[3] - box1[1])
+    area_ground_truth = width_ground_truth * height_ground_truth
+    width_prediction = abs(box2[2] - box2[0])
+    height_prediction = abs(box2[3] - box2[1])
+    area_detection = width_prediction * height_prediction
+    area_union = area_detection + area_ground_truth - area_inter
+
+    # Cálculo do IoU
+    return area_inter / area_union
+
+
 def main():
     images = load_images()
     boxes = load_bounding_boxes()
