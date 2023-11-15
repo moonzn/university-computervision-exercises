@@ -28,15 +28,12 @@ YoloModel.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 # YoloModel.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
 images = load_images()
-boxes = load_bounding_boxes()
+boxes, total_boxes = load_bounding_boxes()
 
-precisions = []
-recalls = []
-average_ious_per_image = []
+max_ious = []
+false_positives, true_positives = 0, 0
 
 for idx in range(len(images)):
-    false_positives, true_positives = 0, 0
-
     img = images[idx]
     img_boxes = boxes[idx]
     img_height, img_width, channels = img.shape
@@ -83,12 +80,9 @@ for idx in range(len(images)):
     # Remover bounding boxes adicionais usando non maximum suppression
     idxs = cv2.dnn.NMSBoxes(bboxes, confidences, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
 
-    detections = 0
-    max_ious = []
     if len(idxs) > 0:
         for i in idxs.flatten():
             iou_values = []
-            max_ious = []
 
             # extrair as coordenadas e dimensoes das bounding boxes resultantes
             (bbox_x, bbox_y) = (bboxes[i][0], bboxes[i][1])
@@ -107,7 +101,6 @@ for idx in range(len(images)):
                 iou = calculate_iou(cast_list_to_int(coord), prediction_box)
                 iou_values.append(iou)
 
-            detections = len(iou_values)
             max_iou = max(iou_values)
             if max_iou >= IOU_THRESHOLD:
                 true_positives += 1
@@ -120,26 +113,17 @@ for idx in range(len(images)):
     img = draw_bounding_boxes(img, boxes[idx])
 
     precision = true_positives/(true_positives + false_positives)
-    recall = true_positives/detections
+    recall = true_positives/total_boxes
     average_iou = sum(max_ious)/len(max_ious)
 
-    print(f"For Image {idx+1}:")
-    print(f"Precision: {precision}"
-          f" | Recall: {recall}"
-          f" | Average IoU: {average_iou}")
+    print(f"After {idx+1} images:")
+    print(f"Precision: {round(precision, 3)}"
+          f" | Recall: {round(recall, 3)}"
+          f" | Average IoU: {round(average_iou, 3)}")
     print("")
-
-    precisions.append(precision)
-    recalls.append(recall)
-    average_ious_per_image.append(average_iou)
 
     cv2.imshow('image', img)
     cv2.waitKey(0)
-
-print(f"Average Metrics for {len(images)} Images:")
-print(f"Average Precision: {sum(precisions)/len(precisions)}"
-      f" | Average Recall: {sum(recalls)/len(recalls)}"
-      f" | Average IoU: {sum(average_ious_per_image)/len(average_ious_per_image)}")
 
 """
 # ciclo de leitura do video

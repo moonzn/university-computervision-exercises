@@ -17,11 +17,13 @@ def load_images():
 
 def load_bounding_boxes():
     boxes = []
+    total = 0
     for filename in os.listdir(ANNOT_PATH):
         path = os.path.join(ANNOT_PATH, filename)
-        box = parse_xml(path)
+        box, count = parse_xml(path)
         boxes.append(box)
-    return boxes
+        total += count
+    return boxes, total
 
 
 def parse_xml(xml):
@@ -34,13 +36,17 @@ def parse_xml(xml):
     # stores all boxes of an img
     boxes_in_img = []
 
+    # counts boxes
+    count = 0
+
     for box in root.findall("./object/bndbox"):
         coords = []
         for coord in box:
             coords.append(coord.text)
         boxes_in_img.append(coords)
+        count += 1
 
-    return boxes_in_img
+    return boxes_in_img, count
 
 
 def draw_bounding_boxes(img, boxes):
@@ -94,7 +100,7 @@ def calculate_iou(box1, box2):
 
 def main():
     images = load_images()
-    boxes = load_bounding_boxes()
+    boxes, count = load_bounding_boxes()
 
     for idx in range(len(images)):
         images[idx] = draw_bounding_boxes(images[idx], boxes[idx])
