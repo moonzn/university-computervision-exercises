@@ -52,7 +52,7 @@ def draw_bounding_boxes(img, boxes):
         end_point = (int(coords[2]), int(coords[3]))
 
         # Blue color in BGR
-        color = (0, 0, 0)
+        color = (135, 135, 135)
 
         # Line thickness of 2 px
         thickness = 2
