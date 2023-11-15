@@ -5,15 +5,15 @@ from draw_bounding_boxes import load_images, load_bounding_boxes, cast_list_to_i
 MODEL_FILE = "config/yolov5s.onnx"
 CLASS_FILE = "config/object_detection_classes_coco.txt"
 
-DATASET_PATH = "dataset/images" # Caminho para as imagens a analisar
-LABELS_PATH = "dataset/labels" # Caminho para as anotações das imagens
+DATASET_PATH = "dataset/images"  # Caminho para as imagens a analisar
+LABELS_PATH = "dataset/labels"   # Caminho para as anotações das imagens
 
 CONFIDENCE_THRESHOLD = 0.33  # Threshold para a confianca nas bounding boxes
 NMS_THRESHOLD = 0.4  # Threshold para o algoritmo non maximum supression
 IOU_THRESHOLD = 0.5  # Threshold para o IoU
 
-WIDTH = 640  # largura da imagem no YOLOV5
-HEIGHT = 640 # altura da imagem no YOLOV5
+WIDTH = 640   # largura da imagem no YOLOV5
+HEIGHT = 640  # altura da imagem no YOLOV5
 
 # ler os nomes das classes
 with open(CLASS_FILE, 'r') as f:
@@ -41,12 +41,11 @@ for idx in range(len(images)):
     x_conversion_factor = img_width / WIDTH
     y_conversion_factor = img_height / HEIGHT
 
-    blob = cv2.dnn.blobFromImage(image=img, scalefactor=1 / 255.0, size=(WIDTH, HEIGHT), swapRB=True) # , size=(640, 640)
+    blob = cv2.dnn.blobFromImage(image=img, scalefactor=1 / 255.0, size=(WIDTH, HEIGHT), swapRB=True)
     YoloModel.setInput(blob)
     predictions = YoloModel.forward()
     outputs = predictions[0]
 
-    print("ouputs shape = ", outputs.shape)
     bboxes = []
     confidences = []
     classIDs = []
@@ -62,7 +61,7 @@ for idx in range(len(images)):
             scores = detection[5:]
 
             classID = np.argmax(scores) + 1
-            if classID != 16: # ID da classe 'cat'
+            if classID != 16:  # ID da classe 'cat'
                 continue
 
             bbox_center_x = detection[0] * x_conversion_factor
@@ -80,8 +79,11 @@ for idx in range(len(images)):
     # Remover bounding boxes adicionais usando non maximum suppression
     idxs = cv2.dnn.NMSBoxes(bboxes, confidences, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
 
+    iou_values = []
     if len(idxs) > 0:
         for i in idxs.flatten():
+            iou_values = []
+
             # extrair as coordenadas e dimensoes das bounding boxes resultantes
             (bbox_x, bbox_y) = (bboxes[i][0], bboxes[i][1])
             (bbox_w, bbox_h) = (bboxes[i][2], bboxes[i][3])
@@ -94,7 +96,6 @@ for idx in range(len(images)):
             cv2.putText(img, text, (bbox_x, bbox_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
 
             # Cálculo das métricas
-            iou_values = []
             for coord in img_boxes:
                 prediction_box = [bbox_x, bbox_y, bbox_x + bbox_w, bbox_y + bbox_h]
                 iou = calculate_iou(cast_list_to_int(coord), prediction_box)
@@ -109,6 +110,9 @@ for idx in range(len(images)):
             print(iou_values)
             print("======================================================")
 
+    print(f"Precision: {true_positives/(true_positives + false_positives)}"
+          f" | Recall: {true_positives/len(iou_values)}"
+          f" | IoU: {max(iou_values)}")
     cv2.imshow('image', img)
     cv2.waitKey(0)
 
