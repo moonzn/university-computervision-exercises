@@ -1,12 +1,12 @@
 import cv2
 import numpy as np
-from draw_bounding_boxes import load_images, load_bounding_boxes, cast_list_to_int, calculate_iou
+from draw_bounding_boxes import load_images, load_bounding_boxes, cast_list_to_int, calculate_iou, draw_bounding_boxes
 
 MODEL_FILE = "config/yolov5s.onnx"
 CLASS_FILE = "config/object_detection_classes_coco.txt"
 
 DATASET_PATH = "dataset/images"  # Caminho para as imagens a analisar
-LABELS_PATH = "dataset/labels"   # Caminho para as anotações das imagens
+ANNOT_PATH = "dataset/annotations"  # Caminho para as anotações das imagens
 
 CONFIDENCE_THRESHOLD = 0.33  # Threshold para a confianca nas bounding boxes
 NMS_THRESHOLD = 0.4  # Threshold para o algoritmo non maximum supression
@@ -29,6 +29,10 @@ YoloModel.setPreferableBackend(cv2.dnn.DNN_BACKEND_OPENCV)
 
 images = load_images()
 boxes = load_bounding_boxes()
+
+precisions = []
+recalls = []
+average_ious_per_image = []
 
 for idx in range(len(images)):
     false_positives, true_positives = 0, 0
@@ -79,10 +83,12 @@ for idx in range(len(images)):
     # Remover bounding boxes adicionais usando non maximum suppression
     idxs = cv2.dnn.NMSBoxes(bboxes, confidences, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
 
-    iou_values = []
+    detections = 0
+    max_ious = []
     if len(idxs) > 0:
         for i in idxs.flatten():
             iou_values = []
+            max_ious = []
 
             # extrair as coordenadas e dimensoes das bounding boxes resultantes
             (bbox_x, bbox_y) = (bboxes[i][0], bboxes[i][1])
@@ -90,7 +96,7 @@ for idx in range(len(images)):
 
             # colocar retangulos e texto a marcar os objetos identificados
             class_name = class_names[classIDs[i]]
-            color = COLORS[classIDs[i]]
+            color = (189, 240, 38)
             cv2.rectangle(img, (bbox_x, bbox_y), (bbox_x + bbox_w, bbox_y + bbox_h), color, 2)
             text = "{}: {:.4f}".format(class_name, confidences[i])
             cv2.putText(img, text, (bbox_x, bbox_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
@@ -101,20 +107,39 @@ for idx in range(len(images)):
                 iou = calculate_iou(cast_list_to_int(coord), prediction_box)
                 iou_values.append(iou)
 
+            detections = len(iou_values)
             max_iou = max(iou_values)
             if max_iou >= IOU_THRESHOLD:
                 true_positives += 1
             else:
                 false_positives += 1
-            print(confidences[i])
-            print(iou_values)
-            print("======================================================")
 
-    print(f"Precision: {true_positives/(true_positives + false_positives)}"
-          f" | Recall: {true_positives/len(iou_values)}"
-          f" | IoU: {max(iou_values)}")
+            max_ious.append(max_iou)
+
+    # Bounding Boxes from Annotations
+    img = draw_bounding_boxes(img, boxes[idx])
+
+    precision = true_positives/(true_positives + false_positives)
+    recall = true_positives/detections
+    average_iou = sum(max_ious)/len(max_ious)
+
+    print(f"For Image {idx+1}:")
+    print(f"Precision: {precision}"
+          f" | Recall: {recall}"
+          f" | Average IoU: {average_iou}")
+    print("")
+
+    precisions.append(precision)
+    recalls.append(recall)
+    average_ious_per_image.append(average_iou)
+
     cv2.imshow('image', img)
     cv2.waitKey(0)
+
+print(f"Average Metrics for {len(images)} Images:")
+print(f"Average Precision: {sum(precisions)/len(precisions)}"
+      f" | Average Recall: {sum(recalls)/len(recalls)}"
+      f" | Average IoU: {sum(average_ious_per_image)/len(average_ious_per_image)}")
 
 """
 # ciclo de leitura do video

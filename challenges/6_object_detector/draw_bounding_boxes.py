@@ -3,7 +3,7 @@ import cv2 as cv
 import xml.etree.ElementTree as ET
 
 IMAGES_PATH = "dataset/images"
-LABELS_PATH = "dataset/labels"
+ANNOT_PATH = "dataset/annotations"
 
 
 def load_images():
@@ -17,8 +17,8 @@ def load_images():
 
 def load_bounding_boxes():
     boxes = []
-    for filename in os.listdir(LABELS_PATH):
-        path = os.path.join(LABELS_PATH, filename)
+    for filename in os.listdir(ANNOT_PATH):
+        path = os.path.join(ANNOT_PATH, filename)
         box = parse_xml(path)
         boxes.append(box)
     return boxes
@@ -52,7 +52,7 @@ def draw_bounding_boxes(img, boxes):
         end_point = (int(coords[2]), int(coords[3]))
 
         # Blue color in BGR
-        color = (255, 0, 0)
+        color = (0, 0, 0)
 
         # Line thickness of 2 px
         thickness = 2
